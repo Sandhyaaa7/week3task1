@@ -1,0 +1,110 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+class MenuItem {
+public:
+    string name;                
+    vector<MenuItem> submenus;  
+
+    MenuItem(const string& itemName) : name(itemName) {}
+
+
+    void addSubmenu(const MenuItem& submenu) {
+        submenus.push_back(submenu);
+    }
+};
+class Menu {
+private:
+    vector<MenuItem> menuItems;   
+
+    int currentMenuIndex = 0; 
+    vector<MenuItem>* currentMenu = nullptr; 
+
+public:
+    Menu() {
+        currentMenu = &menuItems;
+    }
+
+    void addMenuItem(const MenuItem& menuItem) {
+        menuItems.push_back(menuItem);
+    }
+
+    void displayMenu() {
+        cout << "\nCurrent Menu: " << (currentMenu == &menuItems ? "Main Menu" : "Submenu") << "\n";
+        for (size_t i = 0; i < currentMenu->size(); i++) {
+            cout << i + 1 << ". " << (*currentMenu)[i].name << "\n";
+        }
+    }
+    void navigateDown(int selection) {
+        if (selection >= 1 && selection <= currentMenu->size()) {
+            currentMenu = &(*currentMenu)[selection - 1].submenus;
+            currentMenuIndex = 0;
+        } else {
+            cout << "Invalid selection.\n";
+        }
+    }
+    void navigateUp() {
+        if (currentMenu != &menuItems) {
+            currentMenu = &menuItems;
+            currentMenuIndex = 0;
+        } else {
+            cout << "You are already at the root menu.\n";
+        }
+    }
+    void selectOption() {
+        if (!currentMenu->empty()) {
+            navigateDown(1); 
+        } else {
+            cout << "No submenu available.\n";
+        }
+    }
+    void navigate() {
+        int choice;
+        while (true) {
+            displayMenu();
+            cout << "\nEnter your choice (1 to navigate down, 2 to go up, 3 to select, 0 to exit): ";
+            cin >> choice;
+            switch (choice) {
+                case 1:
+                    {
+                        int submenuChoice;
+                        cout << "Select submenu to enter (1-" << currentMenu->size() << "): ";
+                        cin >> submenuChoice;
+                        navigateDown(submenuChoice);
+                        break;
+                    }
+                case 2:
+                    navigateUp();
+                    break;
+                case 3:
+                    selectOption();
+                    break;
+                case 0:
+                    cout << "Exiting menu system.\n";
+                    return;
+                default:
+                    cout << "Invalid choice. Try again.\n";
+            }
+        }
+    }
+};
+
+int main() {
+    MenuItem mainSettings("Settings");
+    MenuItem displaySettings("Display Settings");
+    MenuItem audioSettings("Audio Settings");
+    displaySettings.addSubmenu(MenuItem("Brightness"));
+    displaySettings.addSubmenu(MenuItem("Contrast"));
+    audioSettings.addSubmenu(MenuItem("Volume"));
+    audioSettings.addSubmenu(MenuItem("Balance"));
+    Menu menu;
+    menu.addMenuItem(mainSettings);
+    menu.addMenuItem(displaySettings);
+    menu.addMenuItem(audioSettings);
+    menu.navigate();
+
+    return 0;
+}
+   
+
