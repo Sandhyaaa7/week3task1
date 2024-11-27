@@ -1,0 +1,102 @@
+#include <iostream>
+#include <queue>
+#include <random>
+#include <chrono>
+#include <ctime>
+#include <thread>
+using namespace std;
+enum class EventType {
+    Tap,
+    Swipe
+};
+
+class Event {
+public:
+    EventType eventType;
+    int x, y;
+   string timestamp;
+
+    Event(EventType type, int xCoord, int yCoord)
+        : eventType(type), x(xCoord), y(yCoord) {
+        auto now = chrono::system_clock::now();
+        auto time = chrono::system_clock::to_time_t(now);
+        timestamp = ctime(&time); 
+    }
+    void displayEvent() const {
+        cout << "Event Type: ";
+        if (eventType == EventType::Tap)
+           cout << "Tap";
+        else
+           cout << "Swipe";
+        cout << "\nCoordinates: (" << x << ", " << y << ")\n";
+        cout << "Timestamp: " << timestamp;
+    }
+};
+
+class EventQueue {
+private:
+   queue<Event> events;
+
+public:
+
+    void addEvent(const Event& event) {
+        events.push(event);
+    }
+
+
+    void processEvents() {
+        while (!events.empty()) {
+            Event currentEvent = events.front();
+            events.pop();
+
+            currentEvent.displayEvent();
+            if (currentEvent.eventType == EventType::Tap) {
+               cout << "You tapped at position (" << currentEvent.x << ", " << currentEvent.y << ").\n";
+            }
+            else if (currentEvent.eventType == EventType::Swipe) {
+                string direction = determineSwipeDirection(currentEvent);
+               cout << "Swipe direction: " << direction << ".\n";
+            }
+
+            cout << "---\n";
+        }
+    }
+
+
+    string determineSwipeDirection(const Event& swipeEvent) {
+        if (swipeEvent.y < 0) {
+            return "Up";
+        } else if (swipeEvent.y > 0) {
+            return "Down";
+        } else if (swipeEvent.x < 0) {
+            return "Left";
+        } else if (swipeEvent.x > 0) {
+            return "Right";
+        }
+        return "Unknown";
+    }
+};
+
+void generateRandomEvents(EventQueue& queue) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> coordDist(-100, 100);  
+    uniform_int_distribution<> eventTypeDist(0, 1);  
+
+    for (int i = 0; i < 5; ++i) {
+        int x = coordDist(gen);
+        int y = coordDist(gen);
+        EventType eventType = static_cast<EventType>(eventTypeDist(gen));
+
+        Event newEvent(eventType, x, y);
+        queue.addEvent(newEvent);
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+}
+
+int main() {
+    EventQueue eventQueue;
+    generateRandomEvents(eventQueue);
+    eventQueue.processEvents();
+    return 0;
+}
