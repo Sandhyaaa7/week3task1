@@ -1,0 +1,77 @@
+#include <iostream>
+#include <string>
+#include <map>
+#include <limits>  
+using namespace std;
+class Theme {
+public:
+   string backgroundColor;
+   string fontColor;
+    int fontSize;
+    string iconStyle;
+    Theme()
+        : backgroundColor("White"), fontColor("Black"), fontSize(12), iconStyle("Standard") {}
+
+
+    Theme(string bgColor, string fColor, int fSize, string iStyle)
+        : backgroundColor(bgColor), fontColor(fColor), fontSize(fSize), iconStyle(iStyle) {}
+
+    void applyTheme() const {
+        cout << "Applying Theme:\n";
+        cout << "Background Color: " << backgroundColor << "\n";
+        cout << "Font Color: " << fontColor << "\n";
+        cout << "Font Size: " << fontSize << "\n";
+        cout << "Icon Style: " << iconStyle << "\n";
+    }
+
+    void displayThemePreview() const {
+       cout << backgroundColor << " Background, " 
+                  << fontColor << " Font, "
+                  << fontSize << " Font Size, "
+                  << iconStyle << " Icons\n";
+    }
+};
+
+int main() {
+    map<string, Theme> themes;
+    themes["Classic"] = Theme("White", "Black", 12, "Standard");
+    themes["Sport"] = Theme("Red", "White", 14, "Bold");
+    themes["Eco"] = Theme("Green", "DarkGray", 10, "Simple");
+    int userChoice;
+    bool exitProgram = false;
+
+    while (!exitProgram) {
+        cout << "\nAvailable Themes:\n";
+        int i = 1;
+        for (const auto& theme : themes) {
+            cout << i << ". " << theme.first << "\n";
+            i++;
+        }
+        cout << "Enter the number of the theme you want to apply (0 to exit): ";
+       cin >> userChoice;
+
+        if (cin.fail()) {
+            cin.clear(); 
+           cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+          cout << "Invalid input! Please enter a valid number.\n";
+            continue;
+        }
+        if (userChoice == 0) {
+           cout << "Exiting program.\n";
+            exitProgram = true;
+            continue;
+        }
+        auto it = themes.begin();
+        advance(it, userChoice - 1); 
+
+        if (it != themes.end()) {
+            cout << "\nYou selected the " << it->first << " theme.\n";
+            it->second.displayThemePreview();
+            it->second.applyTheme();
+        } else {
+           cout << "Invalid choice! Please select a valid theme number.\n";
+        }
+    }
+
+    return 0;
+}
