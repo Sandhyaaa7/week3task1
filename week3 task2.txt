@@ -26,7 +26,7 @@ class VehicleData
  
 void  updatevehicleData()
 {
-     srand(time(0));  //specific time purpose we are using
+     srand(time(0)); 
  
        
         speed = rand() % 81;
@@ -71,7 +71,6 @@ VehicleData myCar;
 Display display;
  
  thread dataThread(updateAndDisplayData, ref(myCar), ref(display));
-/*The line thread dataThread(updateAndDisplayData, ref(myCar), ref(display)); creates a new thread in C++ that runs the updateAndDisplayData function.*/
    dataThread.join();
  
     return 0;
